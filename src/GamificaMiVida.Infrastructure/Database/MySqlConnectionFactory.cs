@@ -11,7 +11,16 @@ public sealed class MySqlConnectionFactory
     {
         _connectionString = configuration.GetConnectionString("MySql")
             ?? throw new InvalidOperationException("Missing ConnectionStrings:MySql");
+        var cs = configuration.GetConnectionString("MySql")
+    ?? throw new InvalidOperationException("Missing ConnectionStrings:MySql");
+
+        var builder = new MySql.Data.MySqlClient.MySqlConnectionStringBuilder(cs);
+        Console.WriteLine($"[DB] Server={builder.Server}; Database={builder.Database}; User={builder.UserID}; Port={builder.Port}");
+
+        _connectionString = cs;
+
     }
 
     public MySqlConnection Create() => new MySqlConnection(_connectionString);
+
 }
