@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/GamificaMiVida.Api/GamificaMiVida.Api.csproj" />
+  <Project Path="src/GamificaMiVida.Application/GamificaMiVida.Application.csproj" />
+  <Project Path="src/GamificaMiVida.Domain/GamificaMiVida.Domain.csproj" />
+  <Project Path="src/GamificaMiVida.Infrastructure/GamificaMiVida.Infrastructure.csproj" />
+</Solution>
