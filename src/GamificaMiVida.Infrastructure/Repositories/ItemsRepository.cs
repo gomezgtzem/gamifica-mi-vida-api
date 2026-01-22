@@ -61,6 +61,40 @@ ORDER BY due_at_utc IS NULL, due_at_utc;
         return results;
     }
 
+    public async Task<ItemRow> CreateAsync(byte[] userId, byte type, string title, string? notes, DateTime? dueAtUtc, int xpValue)
+    {
+        var idHex = Guid.NewGuid().ToString("N").ToUpperInvariant();
+        var idBytes = Convert.FromHexString(idHex);
+
+        await using var conn = _factory.Create();
+        await conn.OpenAsync();
+
+        await using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+INSERT INTO items (id, user_id, type, title, notes, due_at_utc, xp_value)
+VALUES (@id, @user_id, @type, @title, @notes, @due_at_utc, @xp_value);
+";
+        cmd.Parameters.Add(new MySqlParameter("@id", MySqlDbType.Binary) { Value = idBytes });
+        cmd.Parameters.Add(new MySqlParameter("@user_id", MySqlDbType.Binary) { Value = userId });
+        cmd.Parameters.Add(new MySqlParameter("@type", MySqlDbType.UByte) { Value = type });
+        cmd.Parameters.Add(new MySqlParameter("@title", MySqlDbType.VarChar) { Value = title });
+        cmd.Parameters.Add(new MySqlParameter("@notes", MySqlDbType.Text) { Value = notes is null ? DBNull.Value : notes });
+        cmd.Parameters.Add(new MySqlParameter("@due_at_utc", MySqlDbType.DateTime) { Value = dueAtUtc is null ? DBNull.Value : dueAtUtc });
+        cmd.Parameters.Add(new MySqlParameter("@xp_value", MySqlDbType.Int32) { Value = xpValue });
+
+        await cmd.ExecuteNonQueryAsync();
+
+        return new ItemRow(
+            idHex,
+            type,
+            title,
+            notes,
+            dueAtUtc,
+            false,
+            xpValue
+        );
+    }
+
     public sealed record ItemRow(
         string IdHex,
         byte Type,
